@@ -62,7 +62,7 @@
     <div class="app__form form--user">
       <h3>Register User</h3>
       <!-- as to register the user simply include a single input element, to include the username -->
-      <form>
+      <form action="/api/exercise/new-user" method="post">
         <div>
           <label for="username">Username*</label>
           <input required type="text" name="username" id="username" placeholder="Timothy">
@@ -84,10 +84,10 @@
         - the exercise's duration
         - the exercise's date (this made up of three separate input elements, for the year, month and day value)
       -->
-      <form>
+      <form action="/api/exercise/add" method="post">
         <div>
-          <label for="userid">User ID*</label>
-          <input required type="text" name="userid" id="userid" placeholder="SyouNR_5Q">
+          <label for="userId">User ID*</label>
+          <input required type="text" name="userId" id="userId" placeholder="SyouNR_5Q">
         </div>
         <div>
           <label for="description">Description*</label>
@@ -100,9 +100,9 @@
 
         <div>
           <label for="date">Date*</label>
-          <input type="number" min="1990" max="2050" name="date-year" id="date-year" placeholder="2018">
-          <input type="number" min="1" max="12" name="date-month" id="date-month" placeholder="10">
-          <input type="number" min="1" max="31" name="date-day" id="date-day" placeholder="09">
+          <input type="number" min="1990" max="2050" name="dateYear" id="dateYear" placeholder="2018">
+          <input type="number" min="1" max="12" name="dateMonth" id="dateMonth" placeholder="10">
+          <input type="number" min="1" max="31" name="dateDay" id="dateDay" placeholder="09">
         </div>
 
         <button>

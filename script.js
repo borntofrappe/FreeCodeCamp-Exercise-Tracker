@@ -49,13 +49,13 @@ const User = mongoose.model('User', userSchema);
 
 // EXPRESS && ROUTING
 // in the root path render the HTML file as found in the views folder
-app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/views/index.html');
+app.get('/', (req, res) => {
+  res.sendFile(`${__dirname}/views/index.html`);
 });
 
 // in the path selected to register a user, retrieve the value of the username
 // register the user if a user is not registered with the same name
-app.post('/api/exercise/new-user', function (req, res) {
+app.post('/api/exercise/new-user', (req, res) => {
   const { username: reqUsername } = req.body;
 
   // search for a document matching the username
@@ -63,14 +63,13 @@ app.post('/api/exercise/new-user', function (req, res) {
     username: reqUsername
   }, (errFound, userFound) => {
     if (errFound) {
-      console.log("findOne() error")
+      console.log('findOne() error');
     }
     // findOne() returns either **null** or a **document** matching the search
     if (userFound) {
       // if a document is found, return a message detailing how the name is not available
-      res.send("username already taken");
-    }
-    else {
+      res.send('username already taken');
+    } else {
       // else create a document for the input username
       // detail log as an empty array
       const user = new User({
@@ -80,7 +79,7 @@ app.post('/api/exercise/new-user', function (req, res) {
       // save the object in the database
       user.save((errSaved, userSaved) => {
         if (errSaved) {
-          console.log("save() error");
+          console.log('save() error');
         }
         // display a JSON object detailing the _id and the username
         const { _id, username } = userSaved;
@@ -94,9 +93,11 @@ app.post('/api/exercise/new-user', function (req, res) {
 });
 
 // in the path selected to register an exercise, find and update the document matching the id
-app.post('/api/exercise/add', function (req, res) {
+app.post('/api/exercise/add', (req, res) => {
   // retrieve the values from the form
-  const { userId: _id, description, duration, dateYear, dateMonth, dateDay } = req.body;
+  const {
+    userId: _id, description, duration, dateYear, dateMonth, dateDay
+  } = req.body;
   // create an instance of the date object, based on the year, month and day value
   const date = new Date(`${dateYear}-${dateMonth}-${dateDay}`);
 
@@ -111,43 +112,42 @@ app.post('/api/exercise/add', function (req, res) {
   User.findOneAndUpdate({
     _id
   },
-    {
-      // push in the log array the new object detailing the exercise
-      $push: {
-        log
-      }
-    },
-    {
-      // in the options set new to be true, as to have the function return the updated document
-      new: true
-    }, (errFound, userFound) => {
-      if (errFound) {
-        console.log("findOne() error");
-      }
-      // findOneAndUpdate returns **null** or a matching **document** depending on whether a match is found
-      if (userFound) {
-        // if a match is found, return a json object detailing the username and latest exercise
-        const { username } = userFound;
-        res.json({
-          _id,
-          username,
-          description,
-          duration,
-          date: date.toDateString()
-        });
-      }
-      else {
-        // findOne returns null, detail the occurrence
-        res.send("unknown _id");
-      }
-    })
+  {
+    // push in the log array the new object detailing the exercise
+    $push: {
+      log
+    }
+  },
+  {
+    // in the options set new to be true, as to have the function return the updated document
+    new: true
+  }, (errFound, userFound) => {
+    if (errFound) {
+      console.log('findOne() error');
+    }
+    // findOneAndUpdate returns **null** or a matching **document** depending on whether a match is found
+    if (userFound) {
+      // if a match is found, return a json object detailing the username and latest exercise
+      const { username } = userFound;
+      res.json({
+        _id,
+        username,
+        description,
+        duration,
+        date: date.toDateString()
+      });
+    } else {
+      // findOne returns null, detail the occurrence
+      res.send('unknown _id');
+    }
+  });
 });
 
 // in the path selected to log the excercises, return the data attached to the userId
 // if existing, otherwise return a JSON object detailing the occurrence
 // ! currently returning all exercises
 // TODO: incorporate the **from** and **to** query strings to return only the selected exercises
-app.get('/api/exercise/log', function (req, res) {
+app.get('/api/exercise/log', (req, res) => {
   const { userId: _id, from, to } = req.query;
 
   // look in the database for a document matching the userId
@@ -155,7 +155,7 @@ app.get('/api/exercise/log', function (req, res) {
     _id
   }, (errFound, userFound) => {
     if (errFound) {
-      console.log("findOne() error");
+      console.log('findOne() error');
     }
 
     if (userFound) {
@@ -168,7 +168,7 @@ app.get('/api/exercise/log', function (req, res) {
       - duration,
       - date
       */
-      const responseLog = log.map(exercise => {
+      const responseLog = log.map((exercise) => {
         const { description, duration } = exercise;
         const date = exercise.date.toDateString();
         return {
@@ -184,10 +184,9 @@ app.get('/api/exercise/log', function (req, res) {
         count,
         log: responseLog
       });
-    }
-    else {
+    } else {
       // else return a JSON object detailing the error
-      res.send("unknown userId");
+      res.send('unknown userId');
     }
   });
 });

@@ -141,16 +141,56 @@ app.post('/api/exercise/add', function (req, res) {
         res.send("unknown _id");
       }
     })
-
 });
 
 // in the path selected to log the excercises, return the data attached to the userId
-// ! if existing, otherwise return a JSON object detailing the occurrence
-// ! currently return a hard-coded message as to test the method
+// if existing, otherwise return a JSON object detailing the occurrence
+// ! currently returning all exercises
+// TODO: incorporate the **from** and **to** query strings to return only the selected exercises
 app.get('/api/exercise/log', function (req, res) {
-  res.send(req.query);
-});
+  const { userId: _id, from, to } = req.query;
 
+  // look in the database for a document matching the userId
+  User.findOne({
+    _id
+  }, (errFound, userFound) => {
+    if (errFound) {
+      console.log("findOne() error");
+    }
+
+    if (userFound) {
+      // if a user is found, return a JSON object detailing the relevant data
+      const { username, log } = userFound;
+      const count = log.length;
+
+      /* in the log array modify the date to show only:
+      - description,
+      - duration,
+      - date
+      */
+      const responseLog = log.map(exercise => {
+        const { description, duration } = exercise;
+        const date = exercise.date.toDateString();
+        return {
+          description,
+          duration,
+          date
+        };
+      });
+
+      res.json({
+        _id,
+        username,
+        count,
+        log: responseLog
+      });
+    }
+    else {
+      // else return a JSON object detailing the error
+      res.send("unknown userId");
+    }
+  });
+});
 
 // listen in the selected port and render the simple application
 app.listen(port);

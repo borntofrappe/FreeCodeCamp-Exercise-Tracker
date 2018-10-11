@@ -4,9 +4,13 @@ const port = 3000;
 /* require the following packages:
 - express
 - body-parser
+- dotenv to read .env variables locally
+- mongoose to interact with the database
 */
 const express = require('express');
 const bodyParser = require('body-parser');
+require('dotenv').config();
+const mongoose = require('mongoose');
 
 // set up an express app
 const app = express();
@@ -16,6 +20,32 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // render the stylesheet as found in the public folder
 app.use(express.static(`${__dirname}/public`));
+
+// connect the application to the database
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true });
+
+// MONGOOSE
+// define the schema
+const { Schema } = mongoose;
+const userSchema = new Schema({
+  username: {
+    type: String,
+    required: true
+  },
+  log: [{
+    description: {
+      type: String
+    },
+    duration: {
+      type: Number
+    },
+    date: {
+      type: Date
+    }
+  }]
+});
+// define the model, on which all documents will be based
+const User = mongoose.model('User', userSchema);
 
 // EXPRESS && ROUTING
 // in the root path render the HTML file as found in the views folder

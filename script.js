@@ -53,11 +53,44 @@ app.get('/', function (req, res) {
   res.sendFile(__dirname + '/views/index.html');
 });
 
-// in the path selected to register a user, retrieve the value of the username and register the user
-// ! first look for an existing entry, in which case return a JSON object detailing the occurrence
+// in the path selected to register a user, retrieve the value of the username
+// register the user if a user is not registered with the same name
 app.post('/api/exercise/new-user', function (req, res) {
-  const { username } = req.body;
-  res.send(username);
+  const { username: reqUsername } = req.body;
+
+  // search for a document matching the username
+  User.findOne({
+    username: reqUsername
+  }, (errFound, userFound) => {
+    if (errFound) {
+      console.log("findOne() error")
+    }
+    // findOne() returns either **null** or a **document** matching the search
+    if (userFound) {
+      // if a document is found, return a message detailing how the name is not available
+      res.send("username already taken");
+    }
+    else {
+      // else create a document for the input username
+      // detail log as an empty array
+      const user = new User({
+        username: reqUsername,
+        log: []
+      });
+      // save the object in the database
+      user.save((errSaved, userSaved) => {
+        if (errSaved) {
+          console.log("save() error");
+        }
+        // display a JSON object detailing the _id and the username
+        const { _id, username } = userSaved;
+        res.json({
+          username,
+          _id
+        });
+      });
+    }
+  });
 });
 
 // in the path selected to register an exercise, retrieve the values for the userId, description, duration and date

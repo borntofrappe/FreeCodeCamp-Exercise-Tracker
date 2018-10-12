@@ -145,8 +145,6 @@ app.post('/api/exercise/add', (req, res) => {
 
 // in the path selected to log the excercises, return the data attached to the userId
 // if existing, otherwise return a JSON object detailing the occurrence
-// ! currently returning all exercises
-// TODO: incorporate the **from** and **to** query strings to return only the selected exercises
 app.get('/api/exercise/log', (req, res) => {
   const { userId: _id, from, to } = req.query;
 

@@ -335,4 +335,66 @@ Given the novelty of the functions, here a few notes on its implementation:
 
   1. a callback function, following the node convention and allowing to handle any error and the return value. This is where the particular project returns a response based on the updated value.
 
-<!-- TODO: handle the query string in its entirety, including the optional values for **from** and **to** -->
+### To & From
+
+As I start documenting my JavaScript approach, I realize the project might have actually be better served using the different query methods provided by Mongoose. Indeed, there exist methods to sort and even limit the number of objects obtained from the database. Additional research in this regard is warranted.
+
+My approach however, and as anticipated, is based entirely on a few JavaScript methods, like `sort`, `filter` and `map`. Here's how I managed to incorporate the optional query string parameters, `&from` and `&to`, to show only those exercises falling in the selected time period.
+
+1. retrieve the query string parameters from the URL.
+
+   ```JS
+   const { userId: _id, from, to } = req.query;
+   ```
+
+1. for the target object, retrieve the string for the username and the array of exercises. The former will be included as-is, while the latter is used to detail a subset of the retrieved information.
+
+   ```JS
+   const { username, log } = userFound;
+   ```
+
+1. create a copy of the array. Later this copy is modified without affecting the original array.
+
+   ```JS
+   const responseLog = [...log];
+   ```
+
+1. consider the query string parameters. As they are optional, their inclusion is predicated on a simple conditional.
+
+   ```JS
+   const { from, to } = req.query;
+   if(from) {
+     // limit the exercises to those occurring after a certain date
+   }
+   if(to) {
+     // limit the exercises to those occurring prior to a certain date
+   }
+   ```
+
+1. create an instance of the date object from the query string parameters themselves. Update then the array nesting the exercises through `array.filter()`, contemplating only those instances occurring in the rightful interval. For `from` for instance.
+
+   ```JS
+   if (from) {
+     const dateFrom = new Date(from);
+     responseLog = responseLog.filter(exercise => exercise.date > dateFrom);
+   }
+   ```
+
+1. update the possibly modified array of exercises to sort the exercises from the oldest to the newest entry.
+
+   ```JS
+   responseLog = responseLog
+    .sort((firstExercise, secondExercise) => firstExercise.date > secondExercise.date);
+   ```
+
+1. immediately following the sorting, loop through the array as to modify the `date` object. This to include the format expected by the user. This as to show `Fri Oct 12 2018` instead of `2018-10-12T00:00:00.000Z`.
+
+   ```JS
+   responseLog = responseLog
+    .sort((firstExercise, secondExercise) => firstExercise.date > secondExercise.date)
+    .map(exercise => ({
+      description: exercise.description,
+      duration: exercise.duration,
+      date: exercise.date.toDateString()
+   }));
+   ```

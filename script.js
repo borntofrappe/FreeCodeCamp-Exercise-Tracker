@@ -112,35 +112,35 @@ app.post('/api/exercise/add', (req, res) => {
   User.findOneAndUpdate({
     _id
   },
-  {
-    // push in the log array the new object detailing the exercise
-    $push: {
-      log
-    }
-  },
-  {
-    // in the options set new to be true, as to have the function return the updated document
-    new: true
-  }, (errFound, userFound) => {
-    if (errFound) {
-      console.log('findOne() error');
-    }
-    // findOneAndUpdate returns **null** or a matching **document** depending on whether a match is found
-    if (userFound) {
-      // if a match is found, return a json object detailing the username and latest exercise
-      const { username } = userFound;
-      res.json({
-        _id,
-        username,
-        description,
-        duration,
-        date: date.toDateString()
-      });
-    } else {
-      // findOne returns null, detail the occurrence
-      res.send('unknown _id');
-    }
-  });
+    {
+      // push in the log array the new object detailing the exercise
+      $push: {
+        log
+      }
+    },
+    {
+      // in the options set new to be true, as to have the function return the updated document
+      new: true
+    }, (errFound, userFound) => {
+      if (errFound) {
+        console.log('findOne() error');
+      }
+      // findOneAndUpdate returns **null** or a matching **document** depending on whether a match is found
+      if (userFound) {
+        //  a match is found, return a JSON object detailing the username and latest exercise
+        const { username } = userFound;
+        res.json({
+          _id,
+          username,
+          description,
+          duration,
+          date: date.toDateString()
+        });
+      } else {
+        // findOne returns null, detail how the ID does not match an existinfg document
+        res.send('unknown _id');
+      }
+    });
 });
 
 // in the path selected to log the excercises, return the data attached to the userId
@@ -161,23 +161,35 @@ app.get('/api/exercise/log', (req, res) => {
     if (userFound) {
       // if a user is found, return a JSON object detailing the relevant data
       const { username, log } = userFound;
-      const count = log.length;
 
-      /* in the log array modify the date to show only:
-      - description,
-      - duration,
-      - date
-      */
-      const responseLog = log.map((exercise) => {
-        const { description, duration } = exercise;
-        const date = exercise.date.toDateString();
-        return {
-          description,
-          duration,
-          date
-        };
-      });
+      // create a copy of the log array, to be modified as to show the relevant exercises in the right order
+      let responseLog = [...log];
 
+      // if **from** and or **to** are specified in the query string
+      // filter the array considering only the exercises past and or prior to the input values
+      if (from) {
+        const dateFrom = new Date(from);
+        responseLog = responseLog.filter(exercise => exercise.date > dateFrom);
+      }
+      if (to) {
+        const dateTo = new Date(to);
+        responseLog = responseLog.filter(exercise => exercise.date < dateTo);
+      }
+
+      // update the array sorting the exercises from oldest to newest
+      responseLog = responseLog
+        .sort((firstExercise, secondExercise) => firstExercise.date > secondExercise.date)
+        .map(exercise => ({
+          // detail the fields of the output formatting the date into the desired format
+          description: exercise.description,
+          duration: exercise.duration,
+          date: exercise.date.toDateString()
+        }));
+
+      // retrieve the length of the updated array
+      const { length: count } = responseLog;
+
+      // return a json object with the pertinent information
       res.json({
         _id,
         username,
@@ -185,7 +197,7 @@ app.get('/api/exercise/log', (req, res) => {
         log: responseLog
       });
     } else {
-      // else return a JSON object detailing the error
+      // findOne() returns null, detail how the userId does not match an existinfg document
       res.send('unknown userId');
     }
   });

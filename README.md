@@ -2,9 +2,9 @@
 
 > Fourth of five projects required to earn the **API and Microservices** certification @freeCodeCamp.
 
-<!-- Link to the working pen for the UI of the application [right here](). -->
+Link to the **pen** for the UI of the application [right here](https://codepen.io/borntofrappe/full/dgvNLK).
 
-<!-- Link to the working glitch for the actual, functioning application [right here](). -->
+Link to the **glitch** application for the actual, functioning application [right here](https://bold-lamprey.glitch.me/).
 
 ## Preface
 

@@ -65,6 +65,7 @@
       <form action="/api/exercise/new-user" method="post">
         <div>
           <label for="username">Username*</label>
+          <p>A name you may like repeating</p>
           <input required type="text" name="username" id="username" placeholder="Timothy">
         </div>
 
@@ -87,22 +88,28 @@
       <form action="/api/exercise/add" method="post">
         <div>
           <label for="userId">User ID*</label>
+          <p>Your randomly-generated ID</p>
           <input required type="text" name="userId" id="userId" placeholder="SyouNR_5Q">
         </div>
         <div>
           <label for="description">Description*</label>
+          <p>What you did this time</p>
           <input required type="text" name="description" id="description" placeholder="Squats">
         </div>
         <div>
           <label for="duration">Duration*</label>
+          <p>How long did it take</p>
           <input required type="number" min="0" name="duration" id="duration" placeholder="15">
         </div>
 
         <div>
           <label for="date">Date*</label>
+          <p>The year</p>
           <input required type="number" min="1990" max="2050" name="dateYear" id="dateYear" placeholder="2018">
+          <p>The month</p>
           <input required type="number" min="1" max="12" name="dateMonth" id="dateMonth" placeholder="10">
-          <input required type="number" min="1" max="31" name="dateDay" id="dateDay" placeholder="09">
+          <p>The day</p>
+          <input required type="number" min="1" max="31" name="dateDay" id="dateDay" placeholder="27">
         </div>
 
         <button>
